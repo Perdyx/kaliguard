@@ -35,6 +35,7 @@ RUN apt-get install -y --no-install-recommends \
     git \
     jq \
     nano \
+    passwd \
     tmux \
     vim \
     wget \
@@ -147,4 +148,9 @@ RUN history -c
 
 ########## Entrypoint ##########
 
+# Add the setup script into the container and ensure it is executable
+COPY setup.sh /usr/local/bin/setup.sh
+RUN chmod +x /usr/local/bin/setup.sh
+
+ENTRYPOINT ["/setup.sh"]
 CMD ["/usr/sbin/sshd", "-D"]

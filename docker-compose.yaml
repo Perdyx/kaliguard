@@ -32,8 +32,8 @@ services:
         condition: service_healthy
         restart: true
     network_mode: "service:gluetun"
-    volumes:
-      - ${RECON_DIR}:/root/recon
+    environment:
+      - ROOT_PASSWORD=${ROOT_PASSWORD}
     stdin_open: true
     tty: true
     restart: unless-stopped
