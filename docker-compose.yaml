@@ -9,7 +9,7 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - "2269:22"
+      - "${SSH_PORT}:22"
     environment:
       - TZ=UTC
       - VPN_SERVICE_PROVIDER=protonvpn
@@ -32,6 +32,8 @@ services:
         condition: service_healthy
         restart: true
     network_mode: "service:gluetun"
+    volumes:
+      - ${RECON_DIR}:/root/recon
     stdin_open: true
     tty: true
     restart: unless-stopped
