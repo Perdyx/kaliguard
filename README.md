@@ -5,13 +5,12 @@
 Create a `.env` file in the project root with the following environment variables:
 
 ```env
-WIREGUARD_PRIVATE_KEY=your_private_key
-SERVER_COUNTRIES=comma,separated,list,of,countries
-FREE_ONLY=true/false
+ROOT_PASSWORD=<your-root-password>
+SSH_PORT=<port>
+WIREGUARD_PRIVATE_KEY=<your_private_key>
+SERVER_COUNTRIES=<comma,separated,list,of,countries>
+FREE_ONLY=<true/false>
 ```
-
-- `WIREGUARD_PRIVATE_KEY`: Your WireGuard private key.  
-- `SERVER_COUNTRIES`: (Optional) A comma-separated list of country codes to restrict server selection (e.g., `US,DE,NL`).
 
 ## Running the Environment
 
@@ -30,6 +29,14 @@ $ docker compose up -d
 ```
 
 ## Customization
+
+### Opening ports on the kaliguard container
+
+Ports can be opened on the kaliguard container by adding them to gluetun container.
+
+### Enabling shared directories
+
+In docker-compose.yaml, file and directory mounts can be added to the kaliguard container as needed.
 
 ### Building the Docker Image
 
