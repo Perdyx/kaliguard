@@ -1,0 +1,37 @@
+name: kaliguard
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "2269:22"
+    environment:
+      - TZ=UTC
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      - FREE_ONLY=${FREE_ONLY}
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  kali:
+    image: kaliguard:latest
+    container_name: kaliguard
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    network_mode: "service:gluetun"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
