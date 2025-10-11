@@ -34,6 +34,7 @@ RUN apt-get install -y --no-install-recommends \
     curl \
     git \
     jq \
+    nano \
     tmux \
     vim \
     wget \
