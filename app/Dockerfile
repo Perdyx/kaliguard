@@ -137,7 +137,7 @@ cat << 'EOF'
 EOF
 
 cat << EOF
-KaliGuard - v0.2.0
+KaliGuard - v0.2.1
 
 Connected via:
 [${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)
@@ -146,7 +146,10 @@ $(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/coun
 Happy hacking!
 EOF
 
-tmux attach || tmux
+# Start or attach to a tmux session if not already in one
+if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
+    tmux attach || tmux
+fi
 RC_EOF
 
 # Simplify the BASH prompt
