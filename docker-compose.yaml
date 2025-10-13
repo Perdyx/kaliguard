@@ -14,7 +14,7 @@ services:
       - TZ=UTC
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=YB8CAyeJIp2HsWSFBiBU/J8tbObAIEh75IQPHU2ZGFQ=
+      - WIREGUARD_PRIVATE_KEY=
       - SERVER_COUNTRIES=Canada,Japan,Netherlands,Norway,Poland,Romania,Singapore,United States
       - FREE_ONLY=true
     healthcheck:
