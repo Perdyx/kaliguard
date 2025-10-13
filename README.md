@@ -1,64 +1,71 @@
 # KaliGuard
 
+KaliGuard is a Dockerized Kali environment routed through an external VPN tunnel using Gluetun. It is intended for privacy-focused penetration testing and reconnaissance.
+
+## Getting started
+
+`$ git clone github.com/Perdyx/kaliguard.git`
+
 ## Configuration
 
-Create a `.env` file in the project root with the following environment variables:
+### Setting the root password
 
-```env
-ROOT_PASSWORD=<your-root-password>
-SSH_PORT=<port>
-WIREGUARD_PRIVATE_KEY=<your_private_key>
-SERVER_COUNTRIES=<comma,separated,list,of,countries>
-FREE_ONLY=<true/false>
+The ROOT_PASSWORD environment variable sets the root user password inside the KaliGuard container.
+
+## VPN provider setup
+
+Gluetun supports a variety of VPN providers. Each provider has specific environment variables that need to be configured properly.
+
+Refer to the official Gluetun setup guide for your VPN provider: https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers
+
+### Shared directories
+
+To share files or directories between your host and the KaliGuard container, add volume mounts to the kaliguard service in docker-compose.yaml:
+
+```
+volumes:
+  - ./host/path:/container/path
 ```
 
-## Running the Environment
+### Changing the default ports or opening new ones
 
-Start the environment in the foreground:
+Because the kaliguard container uses:
 
-```bash
-$ docker compose up
+network_mode: "service:gluetun"
+
+it shares the network stack of the gluetun container. As a result, all port mappings must be defined on the gluetun container.
+
+For example, to change the default SSH port, change the left half of the port configuration:
+
+```
+gluetun:
+  ports:
+    - "<port>:22"
 ```
 
-To stop and remove the environment when running in the foreground, press `Ctrl + C`.
+## Running the environment
 
-Alternatively, to run in detached mode (recommended for server deployments):
+### Building the KaliGuard image
 
-```bash
-$ docker compose up -d
-```
+To build the KaliGuard Docker image locally:
 
-## Customization
+cd app
+docker build -t kaliguard:latest .
 
-### Opening ports on the kaliguard container
+### Docker Compose
 
-Ports can be opened on the kaliguard container by adding them to gluetun container.
+To start the environment in the foreground:
 
-### Enabling shared directories
+`$ docker compose up`
 
-In docker-compose.yaml, file and directory mounts can be added to the kaliguard container as needed.
+To run in detached mode (background):
 
-### Building the Docker Image
+`$ docker compose up -d`
 
-To build the Docker image locally, run:
+To stop and remove containers:
 
-```bash
-$ cd app
-$ docker build -t kaliguard:latest .
-```
+`$ docker compose down`
 
-## Troubleshooting
-
-### SSH Key Regeneration (Optional)
-
-If you need to regenerate SSH keys for localhost access, use:
-
-```bash
-$ ssh-keygen -R "[localhost]:<port>"
-```
-
-Replace `<port>` with the actual port used for the connection.
-
-## Art Credits
+## Art credits
 
 - https://emojicombos.com/oni-ascii-art
