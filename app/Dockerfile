@@ -57,7 +57,7 @@ RUN chmod 0755 /var/run/sshd
 
 # Allow root login and set root password (change 'toor' to a strong password)
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
-RUN echo "root:toor" | chpasswd
+RUN echo "root:kaliguard" | chpasswd
 
 # Expose SSH port and change it to a non-standard port
 EXPOSE 22
