@@ -136,12 +136,12 @@ if [[ -n "$TMUX" && $- == *i* ]]; then
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠿⠿⠟⠻⠿⠿⠟⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
 
-KaliGuard - v0.2.3
+KaliGuard - v0.2.4
 
 EOF
 
-    # Get a list of open IPv4 ports and services
-    lsof -i4 -P -n | grep LISTEN
+    # List network connections
+    lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
 
     # Display connection info
     cat << EOF
