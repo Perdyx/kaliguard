@@ -9,14 +9,14 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - "${SSH_PORT}:22"
+      - "2269:22"
     environment:
       - TZ=UTC
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
-      - FREE_ONLY=${FREE_ONLY}
+      - WIREGUARD_PRIVATE_KEY=YB8CAyeJIp2HsWSFBiBU/J8tbObAIEh75IQPHU2ZGFQ=
+      - SERVER_COUNTRIES=Canada,Japan,Netherlands,Norway,Poland,Romania,Singapore,United States
+      - FREE_ONLY=true
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 20s
@@ -35,6 +35,10 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    environment:
+      - ROOT_PASSWORD=kaliguard
+    volumes:
+      - ./recon:/root/recon
     stdin_open: true
     tty: true
     restart: unless-stopped

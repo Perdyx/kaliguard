@@ -20,6 +20,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GO111MODULE=on \
     PATH=/root/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+# Create directory for shared data
+RUN mkdir -p /root/recon
 
 ########## Install Base Packages ##########
 
@@ -65,7 +67,7 @@ EXPOSE 22
 
 # Install Golang using packaged golang-go for easier maintenance and some helpers
 RUN apt-get install -y --no-install-recommends golang-go
-RUN mkdir -p "/root/go"
+RUN mkdir -p /root/go
 RUN mkdir -p /opt/tools
 RUN chown -R root:root /opt/tools
 RUN go env -w GO111MODULE=on
@@ -209,4 +211,4 @@ RUN history -c
 
 ########## Entrypoint ##########
 
-CMD ["/usr/sbin/sshd", "-D"]
+CMD bash -c "echo 'root:$ROOT_PASSWORD' | chpasswd && /usr/sbin/sshd -D"
