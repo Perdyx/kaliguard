@@ -92,12 +92,11 @@ RUN go install -v github.com/d3mondev/puredns/v2@latest
 # Silence the default Kali welcome message
 RUN touch /root/.hushlogin
 
-# Append motd to .bashrc to display on shell startup
+# Append motd script to .bashrc to display on tmux shell startup
 RUN cat >> /root/.bashrc <<'RC_EOF'
 GREEN=$'\e[1;32m'
 RESET=$'\e[0m'
 
-# Display ASCII banner and connection information in tmux
 if [[ -n "$TMUX" && $- == *i* ]]; then
     cat << 'EOF'
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -136,12 +135,12 @@ if [[ -n "$TMUX" && $- == *i* ]]; then
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠿⠿⠟⠻⠿⠿⠟⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
 
-KaliGuard - v0.2.3
+KaliGuard - v0.2.4
 
 EOF
 
-    # Get a list of open IPv4 ports and services
-    lsof -i4 -P -n | grep LISTEN
+    # List network connections
+    lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
 
     # Display connection info
     cat << EOF
@@ -151,7 +150,6 @@ $(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/coun
 
 EOF
 
-    # Finish motd
     echo "Happy hacking!"
 fi
 
