@@ -97,6 +97,7 @@ RUN cat >> /root/.bashrc <<'RC_EOF'
 GREEN=$'\e[1;32m'
 RESET=$'\e[0m'
 
+# Display ASCII banner
 cat << 'EOF'
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⠿⠓⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -136,6 +137,7 @@ cat << 'EOF'
 
 EOF
 
+# Display KaliGuard version and connection info
 cat << EOF
 KaliGuard - v0.2.1
 
@@ -146,7 +148,11 @@ $(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/coun
 Happy hacking!
 EOF
 
-# Start or attach to a tmux session if not already in one
+# Fix tmux font rendering issues
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Autostart or attach to a tmux session on shell startup, if not already in one
 if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
     tmux attach || tmux
 fi
@@ -161,6 +167,12 @@ set -g status-position top
 set -g status-bg brightred
 set -g pane-active-border-style fg=brightred
 set -g pane-border-style fg=brightred
+
+set -g mouse on
+set -s escape-time 0
+set-window-option -g mode-keys vi
+
+bind -n M-Enter copy-mode
 
 bind -n M-h select-pane -L
 bind -n M-j select-pane -D
