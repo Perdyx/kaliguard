@@ -32,6 +32,9 @@ services:
         condition: service_healthy
         restart: true
     network_mode: "service:gluetun"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     stdin_open: true
     tty: true
     restart: unless-stopped
