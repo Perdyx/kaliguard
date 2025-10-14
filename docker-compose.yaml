@@ -9,12 +9,12 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - "2269:22"
+      - "6901:22"
     environment:
       - TZ=UTC
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=YB8CAyeJIp2HsWSFBiBU/J8tbObAIEh75IQPHU2ZGFQ=
+      - WIREGUARD_PRIVATE_KEY=$WIREGUARD_PRIVATE_KEY
       - SERVER_COUNTRIES=Canada,Japan,Netherlands,Norway,Poland,Romania,Singapore,United States
       - FREE_ONLY=true
     healthcheck:
@@ -24,9 +24,8 @@ services:
       retries: 5
     restart: unless-stopped
 
-  kali:
+  kaliguard:
     image: kaliguard:latest
-    container_name: kaliguard
     depends_on:
       gluetun:
         condition: service_healthy
@@ -36,7 +35,7 @@ services:
       - NET_ADMIN
       - NET_RAW
     environment:
-      - ROOT_PASSWORD=kaliguard
+      - ROOT_PASSWORD=$ROOT_PASSWORD
     volumes:
       - ./recon:/root/recon
     stdin_open: true
