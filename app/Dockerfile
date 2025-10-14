@@ -50,14 +50,17 @@ fi
 
 if [[ -n "$TMUX" && $- == *i* ]]; then
     # Display banner
-    cat .motd.txt # NEEDS COPY
+    cat .motd.txt
+    echo -e "\n\n"
+
+    echo -e "KaliGuard - v0.3.0\n"
 
     # List network connections
     lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
 
     # Display connection info
-    echo "[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
-    echo "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)"
+    echo -e "\n[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
+    echo -e "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)\n"
 
     echo "Happy hacking!"
 fi
