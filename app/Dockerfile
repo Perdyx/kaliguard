@@ -6,11 +6,11 @@ FROM kalilinux/kali-rolling:latest
 
 ########## Setup environment ##########
 
-# Set working directory
-WORKDIR /root
-
 # Use bash as default shell for all RUN commands and for image users
 SHELL ["/bin/bash", "-lc"]
+
+# Silence the default Kali welcome message
+RUN touch /root/.hushlogin
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -20,36 +20,60 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GO111MODULE=on \
     PATH=/root/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Create directory for shared data
-RUN mkdir -p /root/recon
-
-########## Install Base Packages ##########
+# Set working directory
+WORKDIR /root
 
 # Update and upgrade the system
 RUN apt update -y
 RUN apt upgrade -y
 
-# Install base packages and tools
-RUN apt-get install -y --no-install-recommends \
-    # General tools
-    build-essential \
-    curl \
-    git \
-    jq \
-    nano \
-    passwd \
-    tmux \
-    vim \
-    wget \
-    # Kali tools
-    kali-linux-headless \
-    massdns
+
+########## Tmux ##########
+
+# Install tmux
+RUN apt-get install -y --no-install-recommends tmux
+
+# Add banner file and display with welcome message on tmux shell startup
+COPY ./configs/banner.txt /root/.motd.txt
+RUN cat >> /root/.bashrc <<'EOF'
+########## Tmux startup script ##########
+GREEN=$'\e[1;32m'
+RESET=$'\e[0m'
+
+# Fix tmux font rendering issues
+export LANG=en_US.UTF-8
+
+# Autostart or attach to a tmux session on shell startup, if not already in one
+if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
+    tmux attach || tmux
+fi
+
+if [[ -n "$TMUX" && $- == *i* ]]; then
+    # Display banner
+    cat .motd.txt # NEEDS COPY
+
+    # List network connections
+    lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
+
+    # Display connection info
+    echo "[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
+    echo "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)"
+
+    echo "Happy hacking!"
+fi
+EOF
+
+# Simplify the BASH prompt
+RUN sed -i 's/PROMPT_ALTERNATIVE=twoline/PROMPT_ALTERNATIVE=backtrack/g' /root/.bashrc
+
+# Customize tmux
+COPY ./configs/tmux.conf /root/.tmux.conf
 
 
 ########## OpenSSH Server ##########
 
 # Install OpenSSH server
-RUN apt-get install -y openssh-server
+RUN apt-get install -y --no-install-recommends openssh-server
 
 # Create SSH directory and set permissions
 RUN mkdir -p /var/run/sshd
@@ -61,6 +85,22 @@ RUN echo "root:kaliguard" | chpasswd
 
 # Expose SSH port and change it to a non-standard port
 EXPOSE 22
+
+
+########## Install Base Packages ##########
+
+# Install base packages and tools
+RUN apt-get install -y --fix-missing --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    jq \
+    nano \
+    passwd \
+    vim \
+    wget \
+    kali-linux-headless \
+    massdns
 
 
 ########## Golang ##########
@@ -89,48 +129,7 @@ RUN go install -v github.com/jaeles-project/gospider@latest
 RUN go install -v github.com/d3mondev/puredns/v2@latest
 
 
-########## Customizations ##########
-
-# Silence the default Kali welcome message
-RUN touch /root/.hushlogin
-
-# Add banner file and display with welcome message on tmux shell startup
-COPY ./configs/banner.txt /root/.motd.txt
-RUN echo >> /root/.bashrc <<'RC_EOF'
-GREEN=$'\e[1;32m'
-RESET=$'\e[0m'
-
-if [[ -n "$TMUX" && $- == *i* ]]; then
-    # Display banner
-    cat .motd.txt # NEEDS COPY
-
-    # List network connections
-    lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
-
-    # Display connection info
-    echo "[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
-    echo "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)"
-
-    echo "Happy hacking!"
-fi
-
-# Fix tmux font rendering issues
-export LANG=en_US.UTF-8
-
-# Autostart or attach to a tmux session on shell startup, if not already in one
-if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
-    tmux attach || tmux
-fi
-RC_EOF
-
-# Simplify the BASH prompt
-RUN sed -i 's/PROMPT_ALTERNATIVE=twoline/PROMPT_ALTERNATIVE=backtrack/g' /root/.bashrc
-
-# Customize tmux
-COPY ./configs/tmux.conf /root/.tmux.conf
-
-
-########## Image Optimizations ##########
+########## Image Optimizations and Cleanup ##########
 
 # Clean up apt caches and temporary files to keep image smaller
 RUN apt-get autoremove -y
@@ -141,4 +140,6 @@ RUN history -c
 
 ########## Entrypoint ##########
 
-CMD bash -c "echo 'root:$ROOT_PASSWORD' | chpasswd && /usr/sbin/sshd -D"
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
