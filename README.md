@@ -66,6 +66,16 @@ To stop and remove containers:
 
 `$ docker compose down`
 
+## Accessing the environment
+
+To access the Kali machine, SSH into the host machine on the port specified in docker-compose.yaml:
+
+`$ ssh root@<ip> -p <port>`
+
+For example:
+
+`$ ssh root@localhost -p 2269`
+
 ## Art credits
 
 - https://emojicombos.com/oni-ascii-art
