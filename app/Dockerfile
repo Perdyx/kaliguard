@@ -130,6 +130,8 @@ RUN go install -v github.com/ffuf/ffuf/v2@latest
 RUN go install -v github.com/lc/gau/v2/cmd/gau@latest
 RUN go install -v github.com/jaeles-project/gospider@latest
 RUN go install -v github.com/d3mondev/puredns/v2@latest
+RUN go install -v github.com/PentestPad/subzy@latest
+RUN go install -v github.com/sensepost/gowitness@latest
 
 
 ########## Image Optimizations and Cleanup ##########
